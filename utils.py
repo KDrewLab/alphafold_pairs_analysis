@@ -19,12 +19,12 @@ def usedAF3Server(afOutputDir):
 
     files = [file for file in os.listdir(afOutputDir)]
 
-    # AlphaFold3 server output has no subdirectories
-    if not subdirs:
-        return True
     # AlphaFold3 local output has five subdirectories, one for each model (0 - 4)
-    elif len(subdirs) == 5:
+    if len(subdirs) == 5:
         return False
+    # AlphaFold3 server output has 2 subdirectories
+    elif len(subdirs) == 2:
+        return True
     # Sanity check -- this case should never occur
     else:
         print("ERROR: This should not happen")
