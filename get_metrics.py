@@ -128,7 +128,8 @@ def get_already_processed_pairs(output_file):
             next(reader)  # Skip header
             for row in reader:
                 if row:   # Avoid blank lines
-                    existing_pairs.add(row[0])
+                    pair_dir = os.path.dirname(row[0])
+                    existing_pairs.add(pair_dir)
 
     return csv_exists, existing_pairs
 
@@ -225,7 +226,7 @@ def parse_args_for_outfields(args):
     if args.scores_outfmt:
         out_fields += args.scores_outfmt.strip().split()
     else:
-        out_fields += ['model_file', 'iptm', 'dc2', 'pdockq', 'pdockq2', 'ipsae', 'lis']
+        out_fields += ['model_file', 'iptm', 'pdockq', 'pdockq2', 'ipsae', 'lis']
 
     # Parse '--variants' flag for querying UniProt for disease variants with publications
     if args.variants:
@@ -250,7 +251,7 @@ def process_dir(input_dir, outfile, out_fields, outfile_exists, processed_pairs,
         for i, af_pair_output in enumerate(os.listdir(input_dir)):
 
             # Determine if pair has been processed
-            if af_pair_output in processed_pairs:
+            if input_dir + "/" + af_pair_output in processed_pairs:
                 print(f"Skipping already processed pair: {af_pair_output}")
                 continue
 
@@ -282,8 +283,6 @@ def process_dir(input_dir, outfile, out_fields, outfile_exists, processed_pairs,
 
 
 def main():
-    #dc2_csv = "dc2_af3.csv"
-    #dc2_df = pd.read_csv(dc2_csv)
 
     parser = argparse.ArgumentParser(description="Obtain pairwise scoring metrics for entire directory of AlphaFold3 output.")
 
@@ -293,7 +292,7 @@ def main():
 
     parser.add_argument("--screen_interactions", action="store_true", help="Whether to query IntAct for interaction support")
 
-    parser.add_argument("--scores_outfmt", type=str, default="model_file iptm dc2 pdockq pdockq2 ipsae",
+    parser.add_argument("--scores_outfmt", type=str, default="model_file iptm pdockq pdockq2 ipsae",
                         help="Space-separated list of output score fields to include in output\n  e.g., 'gene_id1 gene_id2 iptm dc2 pdockq pdockq2 ipsae lis'")
 
     parser.add_argument("--contact_threshold", action="store", dest="contact_threshold", default=8,
